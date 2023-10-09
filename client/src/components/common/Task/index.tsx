@@ -9,20 +9,9 @@ import { Link } from "react-router-dom";
 import IconText from "@/components/ui/IconText";
 import AvatarGroup from "@/components/ui/AvatarGroup";
 import "./style.scss";
+import { type TaskType } from "@/types/Tasks";
 
-interface PropTypes {
-  id?: number;
-  title?: string;
-  description?: string;
-  status?: string;
-}
-
-const Task = ({
-  id = 1,
-  title = "Food Research",
-  description = "Food design is required for our new project research the best practices.",
-  status = "success"
-}: PropTypes) => {
+const Task = ({ id, title, description, status = "Open" }: TaskType) => {
   return (
     <div className="task">
       <div className="task__header">

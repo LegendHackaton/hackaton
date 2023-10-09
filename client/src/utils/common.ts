@@ -10,3 +10,11 @@ export const insertItemIntoArray = <T>(arr: T[], item: T, index: number) => {
   newArr.splice(index, 0, item);
   return newArr;
 };
+
+export const getAssociativeArray = <T>(arr: T[], field: keyof T) => {
+  return arr.reduce((prev, curr) => {
+    prev[curr[field]] = prev[curr[field]] || [];
+    prev[curr[field]].push(curr);
+    return prev;
+  }, Object.create(null));
+};

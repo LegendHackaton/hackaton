@@ -1,5 +1,5 @@
 // import { Pagination } from "antd";
-import Project from "@/components/common/Project";
+import Project from "@/components/common/ProjectDetail";
 import "./style.scss";
 import { Button, Input } from "antd";
 import { Link } from "react-router-dom";
@@ -7,9 +7,10 @@ import { Link } from "react-router-dom";
 const Projects = () => {
   return (
     <>
-      <div className="kanban-header">
+  {/* TODO: продумать универсальный хедер */}
+      <div className="tasks-header">
         <Input.Search />
-        <Link to="create" className="kanban-header__button">
+        <Link to="create" className="tasks-header__button">
           <Button type="default">Create project</Button>
         </Link>
       </div>

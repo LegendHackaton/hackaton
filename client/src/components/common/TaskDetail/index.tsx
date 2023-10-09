@@ -10,50 +10,17 @@ import { useParams } from "react-router-dom";
 
 import FormLayout from "@/components/layout/ContentLayout";
 import IconText from "@/components/ui/IconText";
+import { useAppSelector } from "@/hooks/useAppSelector";
 import "./style.scss";
 
-export const columns = {
-  Open: [
-    { id: 1, content: "Take out the garbage" },
-    { id: 2, content: "Watch my favorite show" },
-    { id: 3, content: "Charge my phone" },
-    { id: 4, content: "Cook dinner" }
-  ],
-  Process: [
-    { id: 5, content: "Take out the garbage" },
-    { id: 6, content: "Watch my favorite show" },
-    { id: 7, content: "Charge my phone" },
-    { id: 8, content: "Cook dinner" }
-  ],
-  Completed: [
-    { id: 9, content: "Take out the garbage" },
-    { id: 10, content: "Watch my favorite show" },
-    { id: 11, content: "Charge my phone" },
-    { id: 12, content: "Cook dinner" }
-  ]
-};
-
-const allTasks = Object.values(columns).flat();
-
-interface PropTypes {
-  id?: number;
-  title?: string;
-  description?: string;
-  startDate?: string;
-  endDate?: string;
-}
-const Task = ({
-  id = 1,
-  title = "Title",
-  description = "Description",
-  startDate = "07.10.23",
-  endDate = "07.10.23"
-}: PropTypes) => {
-  const params = useParams();
-  const task = allTasks.find((item) => item.id === Number(params.id));
+const Task = () => {
+  const { id } = useParams();
+  const allTasks = useAppSelector((state) => state.tasks.items);
+  const tasksList = Object.values(allTasks).flat();
+  const task = tasksList.find((item) => item.id === Number(id));
   return (
     <FormLayout>
-      <Typography.Title level={3}>{task?.content}</Typography.Title>
+      <Typography.Title level={3}>{task?.title}</Typography.Title>
       <ul className="task-detail__list">
         <li className="task-detail__list-item">
           <div style={{ width: "120px" }}>
@@ -68,7 +35,7 @@ const Task = ({
             <IconText icon={<CheckCircleOutlined />} text="Status" />
           </div>
           <Tag color="success" style={{ fontSize: "12px" }}>
-            Completed
+            {task?.status}
           </Tag>
         </li>
         <li className="task-detail__list-item">
@@ -107,11 +74,7 @@ const Task = ({
         </li>
       </ul>
       <Divider />
-      <p style={{ fontWeight: 300 }}>
-        Lörem ipsum salig nen, ip-tv plus labesa. Eurov yk. Funktionell dumhet
-        sabel som antiras mide. Heteron bionebelt preseling, divis peng. Trer
-        beroren.
-      </p>
+      <p style={{ fontWeight: 300 }}>{task?.description}</p>
     </FormLayout>
   );
 };

@@ -2,7 +2,8 @@ export type TaskStatusType = "Open" | "Process" | "Completed";
 
 export interface TaskType {
   id: number;
-  content: string;
+  title: string;
+  description: string;
   status: TaskStatusType;
 }
 

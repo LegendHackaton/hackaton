@@ -1,4 +1,4 @@
-import TasksSection from "@/components/common/Tasks";
+import TasksSection from "@/components/common/Kanban";
 import { Outlet } from "react-router";
 
 const Tasks = () => {

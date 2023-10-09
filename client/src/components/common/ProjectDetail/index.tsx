@@ -1,15 +1,15 @@
 import { Tag, Typography } from "antd";
 import { FolderOutlined } from "@ant-design/icons";
-import "./style.scss";
 import { Link } from "react-router-dom";
 import IconText from "@/components/ui/IconText";
-import AvatarGroup from "../../ui/AvatarGroup";
+import AvatarGroup from "@/components/ui/AvatarGroup";
+import "./style.scss";
 
 interface PropTypes {
   id?: number;
 }
 
-const Project = ({ id = 1 }: PropTypes) => {
+const ProjectDetail = ({ id = 1 }: PropTypes) => {
   return (
     <div className="project">
       <div className="project__header">
@@ -38,4 +38,4 @@ const Project = ({ id = 1 }: PropTypes) => {
   );
 };
 
-export default Project;
+export default ProjectDetail;

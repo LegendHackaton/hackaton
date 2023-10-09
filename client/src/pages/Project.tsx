@@ -1,22 +1,7 @@
-import Task from "@/components/common/Task";
-import { useAppSelector } from "@/hooks/useAppSelector";
+import TasksList from "@/components/common/Tasks/TasksList";
 
 const Project = () => {
-  const tasks = useAppSelector((store) => store.tasks.items);
-  return (
-    <section>
-      {tasks.map((item) => {
-        return (
-          <Task
-            key={item.id}
-            id={item.id}
-            title={item.content}
-            status="success"
-          />
-        );
-      })}
-    </section>
-  );
+  return <TasksList />;
 };
 
 export default Project;
