@@ -1,0 +1,35 @@
+.header {
+  padding: 0 1.5rem;
+  box-shadow: 0px 4px 12px 0px rgba(0, 0, 0, 0.06);
+  position: relative;
+  z-index: 1;
+  background-color: white;
+  line-height: 1.15;
+  @include flex-between-center;
+  // &__logo {
+  //   font-size: 1.5rem;
+  // }
+  &__search {
+    margin-left: auto;
+    max-width: 30%;
+  }
+  &__user {
+    font-weight: 400;
+    @include flex-start;
+  }
+  &__user-info {
+    @include flex-column;
+    text-align: right;
+  }
+  &__user-name {
+    color: #0d062d;
+  }
+  &__user-desc {
+    color: #787486;
+    margin-top: 0.3rem;
+    font-size: toRem(14);
+  }
+  &__avatar {
+    margin-left: toRem(20);
+  }
+}

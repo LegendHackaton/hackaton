@@ -1,0 +1,22 @@
+.projects {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-top: 1rem;
+  &__title {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 500;
+  }
+  @media screen and (max-width: $lg) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  @media screen and (max-width: $sm) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.projects-pagination {
+  @include flex-center;
+  margin-top: 2rem;
+}

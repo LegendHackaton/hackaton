@@ -1,0 +1,15 @@
+.task-detail {
+  &__list {
+    margin-top: 1.5rem;
+    gap: 1rem;
+    display: flex;
+    flex-direction: column;
+    font-weight: 300;
+  }
+  &__list-item {
+    font-size: toRem(12);
+    display: flex;
+    align-items: center;
+    min-height: 1.5rem;
+  }
+}
