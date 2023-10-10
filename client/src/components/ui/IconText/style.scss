@@ -1,0 +1,6 @@
+.icon-text {
+  @include flex-start-center;
+  gap: 0.5rem;
+  color: $lightTextColor;
+  font-size: toRem(14);
+}

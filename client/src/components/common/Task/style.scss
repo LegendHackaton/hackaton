@@ -1,0 +1,32 @@
+.task {
+  border-radius: 0.5rem;
+  padding: 1rem;
+  background-color: white;
+  box-shadow: $boxShadow;
+  &__header {
+    @include flex-between-center;
+    gap: 0.3rem 1rem;
+    flex-wrap: wrap;
+  }
+  &__title {
+    cursor: pointer;
+  }
+  &__description {
+    color: $lightTextColor;
+    font-size: toRem(14);
+    margin-top: 1rem;
+    line-height: 1.3;
+  }
+  &__users {
+    margin-left: auto;
+  }
+  &__icons {
+    @include flex-start;
+    gap: 1rem;
+  }
+  &__footer {
+    @include flex-between-center;
+    margin-top: 1rem;
+    gap: 1rem;
+  }
+}

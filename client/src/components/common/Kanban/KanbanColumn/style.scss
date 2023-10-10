@@ -1,0 +1,16 @@
+.kanban-column {
+  border-radius: 0.5rem;
+  box-shadow: $boxShadow;
+  background-color: white;
+  &__header {
+    @include flex-between-center;
+    background-color: $primary;
+    color: $darkTextColor;
+    font-weight: 500;
+    padding: toRem(10) 1rem;
+  }
+  &__content {
+    padding: 1rem;
+    background-color: white;
+  }
+}
