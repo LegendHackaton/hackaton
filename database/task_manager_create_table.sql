@@ -8,7 +8,8 @@ create table if not exists t_m.job_titles (
 	id_job_title serial,
 	name_job_title varchar(30) NOT NULL,
 	constraint job_id primary key(id_job_title),
-	constraint j_name unique (name_job_title)
+	constraint j_name unique (name_job_title),
+	constraint upper_letter_name_job_title check (left(name_job_title,1) = left(initcap(name_job_title),1))
 );
 
 CREATE INDEX  if not exists job_titles_in
@@ -20,14 +21,17 @@ create table if not exists t_m.locations (
 	city varchar(30) NOT NULL,
 	timezone TIMETZ NOT NULL,
 	constraint loc_id primary key(location_id),
-	constraint loc_coun unique (country, city)
+	constraint loc_coun unique (country, city),
+	constraint upper_letter_country check (left(country,1) = left(initcap(country),1)),
+	constraint upper_letter_city check (left(city,1) = left(initcap(city),1))
 );
 
 create table if not exists t_m.departments (
 	department_id serial,
 	name_department varchar(100) NOT NULL,
 	constraint dep_id primary key(department_id),
-	constraint dep_name unique (name_department)
+	constraint dep_name unique (name_department),
+	constraint upper_letter_name_department check (left(name_department,1) = left(initcap(name_department),1))
 );
 
 create table if not exists t_m.roles (
@@ -36,21 +40,24 @@ create table if not exists t_m.roles (
 	property_description varchar(30) NOT NULL,
 	constraint rol_id primary key(role_id),
 	constraint rol_name unique (name_role),
-	constraint rol_prop unique (property_description)
+	constraint rol_prop unique (property_description),
+	constraint upper_letter_name_role check (left(name_role,1) = left(initcap(name_role),1))
 );
 
 create table if not exists t_m.project_types (
 	project_type_id serial,
 	name_project_type varchar(30) NOT NULL,
 	constraint pt_id primary key(project_type_id),
-	constraint pt_name unique (name_project_type)
+	constraint pt_name unique (name_project_type),
+	constraint upper_letter_name_project_type check (left(name_project_type,1) = left(initcap(name_project_type),1))
 );
 
 create table if not exists t_m.priority_types (
 	priority_id serial,
 	priority_name varchar(30) NOT NULL,
 	constraint prior_id primary key(priority_id),
-	constraint prior_name unique (priority_name)
+	constraint prior_name unique (priority_name),
+	constraint upper_letter_priority_namee check (left(priority_name,1) = left(initcap(priority_name),1))
 );
 
 create table if not exists t_m.refresh_tokens (
@@ -65,17 +72,20 @@ create table if not exists t_m.project_statuces (
 	project_statuce_id serial,
 	project_statuce_name varchar(30) NOT NULL,
 	constraint pr_status_id primary key(project_statuce_id),
-	constraint pr_st_name unique (project_statuce_name)
+	constraint pr_st_name unique (project_statuce_name),
+	constraint upper_letter_project_statuce_name check (left(project_statuce_name,1) = left(initcap(project_statuce_name),1))
+	
 );
 
-CREATE INDEX  if not exists project_statutes_in
+CREATE INDEX if not exists project_statutes_in
 ON t_m.project_statuces (project_statuce_name);
 
 create table t_m.task_statutes (
 	status_task_id serial,
 	name_status varchar(30) NOT NULL,
 	constraint status_id primary key(status_task_id),
-	constraint st_name unique (name_status)
+	constraint st_name unique (name_status),
+	constraint upper_letter_name_status check (left(name_status,1) = left(initcap(name_status),1))
 );
 
 CREATE INDEX  if not exists task_statutes_in
@@ -85,7 +95,8 @@ create table if not exists t_m.task_types (
 	task_type_id serial,
 	name_task_type varchar(30) NOT NULL,
 	constraint tt_id primary key(task_type_id),
-	constraint tt_name unique (name_task_type)
+	constraint tt_name unique (name_task_type),
+	constraint upper_letter_task_type check (left(name_task_type,1) = left(initcap(name_task_type),1))
 );
 
 create table if not exists t_m.verifications (
@@ -122,7 +133,10 @@ create table if not exists t_m.users (
 	constraint loc_id FOREIGN KEY (location_id) REFERENCES t_m.locations(location_id) ON DELETE set null,
 	constraint creat FOREIGN KEY (creator_id) REFERENCES t_m.users(user_id) ON DELETE restrict,
 	constraint refresh_con FOREIGN KEY (refresh_token_id) REFERENCES t_m.refresh_tokens(refresh_token_id) ON DELETE set null,
-	constraint verify_con FOREIGN KEY (verify_id) REFERENCES t_m.verifications(verify_id) ON DELETE restrict
+	constraint verify_con FOREIGN KEY (verify_id) REFERENCES t_m.verifications(verify_id) ON DELETE restrict,
+	constraint upper_letter_first_name check (first_name = initcap(first_name)),
+	constraint upper_letter_last_name check (last_name = initcap(last_name)),
+	constraint check_email_format check (email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$')
 );
 
 CREATE INDEX  if not exists idx_first_last_name
@@ -217,25 +231,47 @@ create table if not exists t_m.tasks (
 	constraint check_estimate_time_format CHECK (estimate_time ~ '^\d+[dwm]$')
 );
 
-CREATE INDEX  if not exists idx_task_title
+CREATE INDEX if not exists idx_task_title
 ON t_m.tasks (task_title);
 
-CREATE INDEX  if not exists idx_task_type_id
+CREATE INDEX if not exists idx_task_type_id
 ON t_m.tasks (task_type_id);
 
-CREATE INDEX  if not exists idx_user_id
+CREATE INDEX if not exists idx_user_id
 ON t_m.tasks (owner_user);
 
-CREATE INDEX  if not exists idx_assign_id
+CREATE INDEX if not exists idx_assign_id
 ON t_m.tasks (assigner_user);
 
-CREATE INDEX  if not exists idx_project_id
+CREATE INDEX if not exists idx_project_id
 ON t_m.tasks (project_id);
 
-CREATE INDEX  if not exists idx_priority_id
+CREATE INDEX if not exists idx_priority_id
 ON t_m.tasks (priority_id);
 
-CREATE INDEX  if not exists idx_status_task_id
+CREATE INDEX if not exists idx_status_task_id
 ON t_m.tasks (status_task_id);
 
+create table if not exists t_m.comments (
+	comment_id uuid default uuid_generate_v1(),
+	content varchar(1000),
+	task_id uuid,
+	project_id uuid,
+	user_id uuid,
+	created_date date DEFAULT current_date,
+	updated_date date,
+	constraint com_id primary key (comment_id),
+	constraint pr_id_con_com FOREIGN KEY (project_id) REFERENCES t_m.projects(project_id) ON DELETE restrict,
+	constraint task_id_con_com FOREIGN KEY (task_id) REFERENCES t_m.tasks(task_id) ON DELETE restrict,
+	constraint user_id_con_com FOREIGN KEY (user_id) REFERENCES t_m.users(user_id) ON DELETE restrict
+);
+
+CREATE INDEX if not exists id_com_task
+ON t_m.comments(task_id);
+
+CREATE INDEX if not exists id_com_user
+ON t_m.comments (user_id);
+
+CREATE INDEX if not exists id_com_project
+ON t_m.comments (project_id);
 
