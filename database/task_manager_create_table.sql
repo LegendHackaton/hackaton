@@ -1,7 +1,12 @@
 create database task_manager;
 
-create schema t_m;
-create extension "uuid-ossp";
+create schema if not exists t_m;
+
+create extension if not exists "uuid-ossp" schema t_m;
+
+create extension if not exists citext schema t_m;
+create domain t_m.email AS citext
+  check ( value ~ '^[a-zA-Z0-9.!#$%&''*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$' );
 
 
 create table if not exists t_m.job_titles (
@@ -37,7 +42,7 @@ create table if not exists t_m.departments (
 create table if not exists t_m.roles (
 	role_id serial,
 	name_role varchar(30) NOT NULL,
-	property_description varchar(30) NOT NULL,
+	property_description varchar(200) NOT NULL,
 	constraint rol_id primary key(role_id),
 	constraint rol_name unique (name_role),
 	constraint rol_prop unique (property_description),
@@ -58,14 +63,6 @@ create table if not exists t_m.priority_types (
 	constraint prior_id primary key(priority_id),
 	constraint prior_name unique (priority_name),
 	constraint upper_letter_priority_namee check (left(priority_name,1) = left(initcap(priority_name),1))
-);
-
-create table if not exists t_m.refresh_tokens (
-	refresh_token_id uuid default uuid_generate_v1(),
-	refresh_token bigint NOT NULL,
-	expiretion_date TIMESTAMP,
-	constraint refresh_id primary key(refresh_token_id),
-	constraint refresh_tok unique (refresh_token)
 );
 
 create table if not exists t_m.project_statuces (
@@ -99,29 +96,22 @@ create table if not exists t_m.task_types (
 	constraint upper_letter_task_type check (left(name_task_type,1) = left(initcap(name_task_type),1))
 );
 
-create table if not exists t_m.verifications (
-	verify_id uuid default uuid_generate_v1(),
-	verify_code bigint NOT NULL,
-	verify_status boolean NOT NULL,
-	constraint con_verify_id primary key(verify_id),
-	constraint verify_c_cone unique (verify_code)
-);
-
 create table if not exists t_m.users (
 	user_id uuid default uuid_generate_v1(),
 	id_job_title int,
 	first_name varchar(30) NOT NULL,
 	last_name varchar(30) NOT NULL,
-	email varchar(40) NOT NULL,
+	email t_m.email NOT NULL,
 	password varchar NOT NULL,
 	department_id int,
 	role_id int,
 	telephone varchar(20) NOT NULL,
 	created_date date default current_date,
 	location_id int,
-	creator_id uuid,
-	refresh_token_id uuid,
-	verify_id uuid,
+	refresh_token int,
+	expiretion_date_token timestamp,
+	verify_code int,
+	verify_status boolean NOT NULL,
 	constraint us_id primary key(user_id),
 	constraint ft_name unique (first_name),
 	constraint lt_name unique (last_name),
@@ -131,12 +121,10 @@ create table if not exists t_m.users (
 	constraint dep_id FOREIGN KEY (department_id) REFERENCES t_m.departments(department_id) ON DELETE set null,
 	constraint rl_id FOREIGN KEY (role_id) REFERENCES t_m.roles(role_id) ON DELETE set null,
 	constraint loc_id FOREIGN KEY (location_id) REFERENCES t_m.locations(location_id) ON DELETE set null,
-	constraint creat FOREIGN KEY (creator_id) REFERENCES t_m.users(user_id) ON DELETE restrict,
-	constraint refresh_con FOREIGN KEY (refresh_token_id) REFERENCES t_m.refresh_tokens(refresh_token_id) ON DELETE set null,
-	constraint verify_con FOREIGN KEY (verify_id) REFERENCES t_m.verifications(verify_id) ON DELETE restrict,
 	constraint upper_letter_first_name check (first_name = initcap(first_name)),
 	constraint upper_letter_last_name check (last_name = initcap(last_name)),
-	constraint check_email_format check (email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$')
+	constraint refresh_tok unique (refresh_token),
+	constraint verify_c_cone unique (verify_code)
 );
 
 CREATE INDEX  if not exists idx_first_last_name
@@ -153,16 +141,6 @@ ON t_m.users (role_id);
 
 CREATE INDEX  if not exists idx_location_id
 ON t_m.users (location_id);
-
-CREATE INDEX  if not exists idx_creator_id
-ON t_m.users (creator_id);
-
-CREATE INDEX  if not exists idx_refresh_token
-ON t_m.users (refresh_token_id);
-
-CREATE INDEX  if not exists idx_verify_id
-ON t_m.users (verify_id);
-
 
 create table if not exists t_m.projects (
 	project_id uuid default uuid_generate_v1(),
