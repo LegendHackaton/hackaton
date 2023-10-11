@@ -1,13 +1,9 @@
-create database task_manager;
+/*drop schema if exists t_m cascade;
+drop extension "uuid-ossp" попробуй запусти сначала эти 2 строки , чтобы ошибок не было*/
 
 create schema if not exists t_m;
 
-create extension if not exists "uuid-ossp" schema t_m;
-
-create extension if not exists citext schema t_m;
-create domain t_m.email AS citext
-  check ( value ~ '^[a-zA-Z0-9.!#$%&''*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$' );
-
+create extension if not exists "uuid-ossp";
 
 create table if not exists t_m.job_titles (
 	id_job_title serial,
@@ -17,8 +13,8 @@ create table if not exists t_m.job_titles (
 	constraint upper_letter_name_job_title check (left(name_job_title,1) = left(initcap(name_job_title),1))
 );
 
-CREATE INDEX  if not exists job_titles_in
-ON t_m.job_titles (name_job_title);
+create index if not exists job_titles_in
+on t_m.job_titles (name_job_title);
 
 create table if not exists t_m.locations (
 	location_id serial,
@@ -65,28 +61,27 @@ create table if not exists t_m.priority_types (
 	constraint upper_letter_priority_namee check (left(priority_name,1) = left(initcap(priority_name),1))
 );
 
-create table if not exists t_m.project_statuces (
-	project_statuce_id serial,
-	project_statuce_name varchar(30) NOT NULL,
-	constraint pr_status_id primary key(project_statuce_id),
-	constraint pr_st_name unique (project_statuce_name),
-	constraint upper_letter_project_statuce_name check (left(project_statuce_name,1) = left(initcap(project_statuce_name),1))
-	
+create table if not exists t_m.project_statuses (
+	project_status_id serial,
+	project_status_name varchar(30) NOT NULL,
+	constraint pr_status primary key(project_status_id),
+	constraint pr_st_na unique (project_status_name),
+	constraint upper_letter_project_status_name check (left(project_status_name,1) = left(initcap(project_status_name),1))
 );
 
-CREATE INDEX if not exists project_statutes_in
-ON t_m.project_statuces (project_statuce_name);
+create index if not exists project_statuses_in
+on t_m.project_statuses (project_status_name);
 
-create table t_m.task_statutes (
+create table if not exists t_m.task_statuses (
 	status_task_id serial,
 	name_status varchar(30) NOT NULL,
-	constraint status_id primary key(status_task_id),
-	constraint st_name unique (name_status),
+	constraint stat_id primary key(status_task_id),
+	constraint st_name_con unique (name_status),
 	constraint upper_letter_name_status check (left(name_status,1) = left(initcap(name_status),1))
 );
 
-CREATE INDEX  if not exists task_statutes_in
-ON t_m.task_statutes (name_status);
+create index if not exists task_statuses_in
+ON t_m.task_statuses (name_status);
  
 create table if not exists t_m.task_types (
 	task_type_id serial,
@@ -101,7 +96,7 @@ create table if not exists t_m.users (
 	id_job_title int,
 	first_name varchar(30) NOT NULL,
 	last_name varchar(30) NOT NULL,
-	email t_m.email NOT NULL,
+	email text NOT NULL,
 	password varchar NOT NULL,
 	department_id int,
 	role_id int,
@@ -124,23 +119,24 @@ create table if not exists t_m.users (
 	constraint upper_letter_first_name check (first_name = initcap(first_name)),
 	constraint upper_letter_last_name check (last_name = initcap(last_name)),
 	constraint refresh_tok unique (refresh_token),
-	constraint verify_c_cone unique (verify_code)
+	constraint verify_c_cone unique (verify_code),
+	constraint email_con_2 check(email ~ '^[a-zA-Z0-9.!#$%&''*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$' )
 );
 
-CREATE INDEX  if not exists idx_first_last_name
-ON t_m.users (first_name, last_name);
+create index if not exists idx_first_last_name
+on t_m.users (first_name, last_name);
 
-CREATE INDEX  if not exists idx_id_user_type
-ON t_m.users (id_job_title);
+create index if not exists idx_id_user_type
+on t_m.users (id_job_title);
 
-CREATE INDEX  if not exists  idx_department_id
-ON t_m.users (department_id);
+create index if not exists  idx_department_id
+on t_m.users (department_id);
 
-CREATE INDEX  if not exists idx_role_id
-ON t_m.users (role_id);
+create index if not exists idx_role_id
+on t_m.users (role_id);
 
-CREATE INDEX  if not exists idx_location_id
-ON t_m.users (location_id);
+create index if not exists idx_location_id
+on t_m.users (location_id);
 
 create table if not exists t_m.projects (
 	project_id uuid default uuid_generate_v1(),
@@ -149,27 +145,27 @@ create table if not exists t_m.projects (
 	start_date date NOT NULL,
 	end_date date NOT NULL,
 	project_description varchar(500) NOT NULL,
-	project_statuce_id int,
+	project_status_id int,
 	owner_user uuid,
 	created_date date DEFAULT current_date,
 	constraint proj_id primary key(project_id),
 	constraint ptoj_tit unique (project_title),
 	constraint pro_type FOREIGN KEY (project_type_id) REFERENCES t_m.project_types(project_type_id) ON DELETE set null,
-	constraint pro_st FOREIGN KEY (project_statuce_id) REFERENCES t_m.project_statuces(project_statuce_id) ON DELETE set null,
+	constraint pro_st FOREIGN KEY (project_status_id) REFERENCES t_m.project_statuses(project_status_id) ON DELETE set null,
 	constraint own_con FOREIGN KEY (owner_user) REFERENCES t_m.users(user_id) ON DELETE restrict
 );
 
-CREATE INDEX  if not exists idx_project_title
-ON t_m.projects (project_title);
+create index if not exists idx_project_title
+on t_m.projects (project_title);
 
-CREATE INDEX  if not exists idx_project_type_id
-ON t_m.projects (project_type_id);
+create index if not exists idx_project_type_id
+on t_m.projects (project_type_id);
 
-CREATE INDEX  if not exists ix_pro_st
-ON t_m.projects (project_statuce_id);
+create index if not exists ix_pro_st
+on t_m.projects (project_status_id);
 
-CREATE INDEX  if not exists ix_own
-ON t_m.projects (owner_user);
+create index if not exists ix_own
+on t_m.projects (owner_user);
 
 create table if not exists t_m.key_project_role (
 	project_id uuid,
@@ -178,11 +174,11 @@ create table if not exists t_m.key_project_role (
 	constraint role_id_con FOREIGN KEY (role_id) REFERENCES t_m.roles(role_id) ON DELETE restrict
 );
 
-CREATE INDEX  if not exists id_id_con
-ON t_m.key_project_role(project_id);
+create index if not exists id_id_con
+on t_m.key_project_role(project_id);
 
-CREATE INDEX  if not exists id_role_id
-ON t_m.key_project_role (role_id);
+create index if not exists id_role_id
+on t_m.key_project_role (role_id);
 
 create table if not exists t_m.tasks (
 	task_id uuid default uuid_generate_v1(),
@@ -205,30 +201,30 @@ create table if not exists t_m.tasks (
 	constraint assign_us FOREIGN KEY (assigner_user) REFERENCES t_m.users(user_id) ON DELETE restrict,
 	constraint pr_id FOREIGN KEY (project_id) REFERENCES t_m.projects(project_id) ON DELETE restrict,
 	constraint prior_id FOREIGN KEY (priority_id) REFERENCES t_m.priority_types(priority_id) ON DELETE set null,
-	constraint st_id FOREIGN KEY (status_task_id) REFERENCES t_m.task_statutes(status_task_id) ON DELETE set null,
+	constraint st_id FOREIGN KEY (status_task_id) REFERENCES t_m.task_statuses(status_task_id) ON DELETE set null,
 	constraint check_estimate_time_format CHECK (estimate_time ~ '^\d+[dwm]$')
 );
 
-CREATE INDEX if not exists idx_task_title
-ON t_m.tasks (task_title);
+create index if not exists idx_task_title
+on t_m.tasks (task_title);
 
-CREATE INDEX if not exists idx_task_type_id
-ON t_m.tasks (task_type_id);
+create index if not exists idx_task_type_id
+on t_m.tasks (task_type_id);
 
-CREATE INDEX if not exists idx_user_id
-ON t_m.tasks (owner_user);
+create index if not exists idx_user_id
+on t_m.tasks (owner_user);
 
-CREATE INDEX if not exists idx_assign_id
-ON t_m.tasks (assigner_user);
+create index if not exists idx_assign_id
+on t_m.tasks (assigner_user);
 
-CREATE INDEX if not exists idx_project_id
-ON t_m.tasks (project_id);
+create index if not exists idx_project_id
+on t_m.tasks (project_id);
 
-CREATE INDEX if not exists idx_priority_id
-ON t_m.tasks (priority_id);
+create index if not exists idx_priority_id
+on t_m.tasks (priority_id);
 
-CREATE INDEX if not exists idx_status_task_id
-ON t_m.tasks (status_task_id);
+create index if not exists idx_status_task_id
+on t_m.tasks (status_task_id);
 
 create table if not exists t_m.comments (
 	comment_id uuid default uuid_generate_v1(),
@@ -244,12 +240,12 @@ create table if not exists t_m.comments (
 	constraint user_id_con_com FOREIGN KEY (user_id) REFERENCES t_m.users(user_id) ON DELETE restrict
 );
 
-CREATE INDEX if not exists id_com_task
-ON t_m.comments(task_id);
+create index if not exists id_com_task
+on t_m.comments(task_id);
 
-CREATE INDEX if not exists id_com_user
-ON t_m.comments (user_id);
+create index if not exists id_com_user
+on t_m.comments (user_id);
 
-CREATE INDEX if not exists id_com_project
-ON t_m.comments (project_id);
+create index if not exists id_com_project
+on t_m.comments (project_id);
 
